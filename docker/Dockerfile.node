@@ -1,0 +1,48 @@
+FROM ubuntu:20.04
+
+
+RUN apt-get update -y && \
+  apt-get install -y automake build-essential apt-utils curl \
+  clang git make libssl-dev llvm libudev-dev protobuf-compiler && \
+  apt-get clean
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get update -y
+RUN apt-get install -y nodejs yarn
+RUN node --version
+RUN yarn --version
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+RUN rustup toolchain install nightly-2023-03-20 --force
+RUN rustup default nightly-2023-03-20
+RUN rustup component add rust-src
+RUN rustup update nightly && \
+  rustup update stable && \
+  rustup target add wasm32-unknown-unknown --toolchain nightly-2023-03-20
+
+RUN git clone -b polkadot-v0.9.30 --depth 1 https://github.com/substrate-developer-hub/substrate-node-template /substrate-node
+
+COPY ./pallet /pallet
+
+WORKDIR /substrate-node
+RUN git apply /pallet/silentdata.patch
+RUN cargo build --release
+
+WORKDIR /
+
+RUN git clone https://github.com/substrate-developer-hub/substrate-front-end-template /node-fe
+RUN cd /node-fe && rm yarn.lock && yarn install
+
+WORKDIR /
+
+COPY ./docker/start.sh /.
+RUN chmod +x /start.sh
+
+EXPOSE 8000
+EXPOSE 9944
+CMD ./start.sh

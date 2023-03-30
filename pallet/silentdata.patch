@@ -1,0 +1,51 @@
+diff --git a/runtime/Cargo.toml b/runtime/Cargo.toml
+index c8d0b4d..9e77f12 100644
+--- a/runtime/Cargo.toml
++++ b/runtime/Cargo.toml
+@@ -15,6 +15,7 @@ targets = ["x86_64-unknown-linux-gnu"]
+ [dependencies]
+ codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive"] }
+ scale-info = { version = "2.1.1", default-features = false, features = ["derive"] }
++silentdata = { default-features = false, path = "../../pallet" } 
+ 
+ pallet-aura = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.30" }
+ pallet-balances = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.30" }
+@@ -60,6 +61,7 @@ std = [
+ 	"frame-system-benchmarking?/std",
+ 	"frame-benchmarking?/std",
+ 	"codec/std",
++  "silentdata/std",
+ 	"scale-info/std",
+ 	"frame-executive/std",
+ 	"frame-support/std",
+diff --git a/runtime/src/lib.rs b/runtime/src/lib.rs
+index f801068..d789c1d 100644
+--- a/runtime/src/lib.rs
++++ b/runtime/src/lib.rs
+@@ -275,6 +275,18 @@ impl pallet_template::Config for Runtime {
+ 	type RuntimeEvent = RuntimeEvent;
+ }
+ 
++pub use silentdata;
++
++parameter_types! {
++  pub const EnclavePublicKey:[u8;33] = [2, 9, 180, 190, 216, 82, 134, 191, 115, 219, 112, 155, 118, 205, 148, 244, 52, 252, 163, 43, 152, 108, 144, 77, 200, 226, 96, 194, 154, 55, 144, 2, 164];
++}
++
++impl silentdata::Config for Runtime {
++  type EnclavePublicKey = EnclavePublicKey;
++
++  type MaxLength = ConstU32<50>;
++}
++
+ // Create the runtime by composing the FRAME pallets that were previously configured.
+ construct_runtime!(
+ 	pub struct Runtime
+@@ -293,6 +305,7 @@ construct_runtime!(
+ 		Sudo: pallet_sudo,
+ 		// Include the custom logic from the pallet-template in the runtime.
+ 		TemplateModule: pallet_template,
++		Silentdata: silentdata,
+ 	}
+ );
+ 

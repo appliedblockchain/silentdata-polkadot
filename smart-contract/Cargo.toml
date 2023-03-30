@@ -1,0 +1,29 @@
+[package]
+name = "silentdata"
+version = "0.1.0"
+authors = ["[your_name] <[your_email]>"]
+edition = "2021"
+
+[dependencies]
+hex = { version = "0.4.3", default-features = false, features = ["alloc"] }
+ink = { version = "4.0.0", default-features = false }
+minicbor = { version = "0.19.0" }
+scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
+scale-info = { version = "2.3", default-features = false, features = ["derive"], optional = true }
+
+[dev-dependencies]
+test-helpers = { path = "../test-helpers" }
+
+[lib]
+name = "silentdata"
+path = "lib.rs"
+crate-type = ["cdylib"]
+
+[features]
+default = ["std"]
+std = [
+    "ink/std",
+    "scale/std",
+    "scale-info/std",
+]
+ink-as-dependency = []

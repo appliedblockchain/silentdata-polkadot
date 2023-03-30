@@ -1,0 +1,15 @@
+[package]
+name = "test-helpers"
+version = "0.1.0"
+authors = ["[your_name] <[your_email]>"]
+edition = "2021"
+
+[dependencies]
+hex = { version = "0.4.3", features = ["alloc"] }
+keccak-hash = { version = "0.10.0" }
+secp256k1 = { version = "0.26.0", features = ["recovery", "global-context"] }
+serde = { version = "1.0.152" }
+serde_bytes = { version = "0.11" }
+serde_cbor = { version = "0.11.2" }
+sp-core = { version = "18.0.0" }
+sp-io = { version = "20.0.0" }
