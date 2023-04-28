@@ -2,6 +2,14 @@
 
 ## Node
 
+Using node version 18.15.0
+
+### Install
+
+```bash
+npm install
+```
+
 ### Build
 
 ```bash
